@@ -1,3 +1,8 @@
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -5,16 +10,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class FirstSeleniumPractice {
 
@@ -33,7 +35,7 @@ public class FirstSeleniumPractice {
     WebDriver driver;
 
 
-    @BeforeMethod
+    @BeforeEach
     public void setUpDriver(){
         System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver_win32/chromedriver.exe");
         driver = new ChromeDriver();
@@ -44,7 +46,7 @@ public class FirstSeleniumPractice {
 //        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
     }
 
-    @AfterMethod (alwaysRun = true)
+    @AfterEach
     public void setDownDriver (){
         driver.quit();
     }
@@ -55,7 +57,6 @@ public class FirstSeleniumPractice {
         driver.findElement(LOGO).click();
         assertTrue(driver.findElement(LOGO).isDisplayed());
 
-        driver.quit();
     }
 
     @Test
@@ -73,10 +74,12 @@ public class FirstSeleniumPractice {
         driver.findElement(SEARCH_INPUT_FIELD).sendKeys("Blouse");
         driver.findElement(SUBMIT_BUTTON).click();
 
-        Assert.assertEquals("Blouse",driver.findElement(PRODUCT_NAME).getText());
+        //Применяю assertThat из библиотеки AsertJ
+        assertThat(driver.findElement(PRODUCT_NAME).getText()).isEqualTo("Blouse");
     }
 
-    @Test(priority = 1, dataProvider = "userEmail")
+    @ParameterizedTest
+    @ValueSource(strings = {"test@gmail.com", "test@hotmail.com", "test@yahoo.com"})
     public void checkCreateAccountPage(String email){
 
         assertTrue(driver.findElement(SIGN_IN_BUTTON).isDisplayed());
@@ -90,12 +93,9 @@ public class FirstSeleniumPractice {
         assertTrue(driver.findElement(CREATE_AN_ACCOUNT_PAGE).isDisplayed());
     }
 
-    @DataProvider
-    public Object[][]userEmail(){
-        return new Object[][]{{"test@gmail.com"},{"test@hotmail.com"},{"test@yahoo.com"}};
-    }
 
-    @Test (priority = 1, dataProvider = "invalidEmails")
+    @ParameterizedTest
+    @ValueSource(strings = {"testgmail.com", "test@@gmail.com", "test@@gmail.com", " "})
     public void checkInputInvalidEmail(String val){
 
         assertTrue(driver.findElement(SIGN_IN_BUTTON).isEnabled());
@@ -110,18 +110,14 @@ public class FirstSeleniumPractice {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); //создаем объект кдасса WebDriverWait, передаем ему в параметрах наш драйвер и устанавливаем время ожидания 10 сек
         wait.until(ExpectedConditions.presenceOfElementLocated(CREATE_ACCOUNT_ERROR_MESSAGE)); // используем метод until объекта wait, выбираем условие выполнение которого заканчивает ожидание
 
-        assertEquals(driver.findElement(CREATE_ACCOUNT_ERROR_MESSAGE).getText(), "Invalid email address.", "Something went wrong");
-    }
-
-    @DataProvider
-    public Object[][] invalidEmails(){
-        return new Object[][]{{"testgmail.com"},{"test@@gmail.com"},{"test @gmail.com"},{" "}};
+        //Применяю assertThat из библиотеки AsertJ
+        assertThat(driver.findElement(CREATE_ACCOUNT_ERROR_MESSAGE).getText()).isEqualTo("Invalid email address.");
     }
 
     @Test
     public void checkDaysDropDown31Days(){
 
-        assertTrue(driver.findElement(SIGN_IN_BUTTON).isEnabled());
+       assertTrue(driver.findElement(SIGN_IN_BUTTON).isEnabled());
         driver.findElement(SIGN_IN_BUTTON).click();
 
         assertTrue(driver.findElement(CREATE_AN_ACCOUNT_FORM).isDisplayed());
