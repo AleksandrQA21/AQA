@@ -15,6 +15,8 @@ import java.time.Duration;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class FirstSeleniumPractice {
 
@@ -51,18 +53,13 @@ public class FirstSeleniumPractice {
 
     @Test
     public void isLogoDisplayed(){
-
         driver.findElement(LOGO).click();
         assertTrue(driver.findElement(LOGO).isDisplayed());
-
-        driver.quit();
     }
 
     @Test
     public void isSearchFieldDisplayed(){
-
         assertTrue(driver.findElement(SEARCH_INPUT_FIELD).isDisplayed());
-
     }
 
     @Test
@@ -73,7 +70,8 @@ public class FirstSeleniumPractice {
         driver.findElement(SEARCH_INPUT_FIELD).sendKeys("Blouse");
         driver.findElement(SUBMIT_BUTTON).click();
 
-        Assert.assertEquals("Blouse",driver.findElement(PRODUCT_NAME).getText());
+        // Использую ассерт библиотеке Hamcrest
+        assertThat("Blouse", equalTo(driver.findElement(PRODUCT_NAME).getText()));
     }
 
     @Test(priority = 1, dataProvider = "userEmail")
@@ -110,7 +108,8 @@ public class FirstSeleniumPractice {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); //создаем объект кдасса WebDriverWait, передаем ему в параметрах наш драйвер и устанавливаем время ожидания 10 сек
         wait.until(ExpectedConditions.presenceOfElementLocated(CREATE_ACCOUNT_ERROR_MESSAGE)); // используем метод until объекта wait, выбираем условие выполнение которого заканчивает ожидание
 
-        assertEquals(driver.findElement(CREATE_ACCOUNT_ERROR_MESSAGE).getText(), "Invalid email address.", "Something went wrong");
+        // Использую ассерт библиотеке Hamcrest
+        assertThat("Invalid email address.", equalTo(driver.findElement(CREATE_ACCOUNT_ERROR_MESSAGE).getText()));
     }
 
     @DataProvider
