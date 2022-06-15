@@ -1,3 +1,9 @@
+import helpers.MainPageHelper;
+import helpers.SignInPageHelper;
+import io.qameta.allure.Description;
+import io.qameta.allure.Link;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -16,19 +22,23 @@ import java.time.Duration;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static utils.PropertyFactory.property;
 
-public class FirstSeleniumPractice {
+public class FirstSeleniumPracticeTest {
 
     WebDriver driver;
     MainPage mainPage;
     SignInPage signInPage;
+    MainPageHelper mainPageHelper;
+    SignInPageHelper signInPageHelper;
 
     @BeforeMethod
     public void setUpDriver(){
-        driver = new DriverFactory().getDriver("CHROME");
+        driver = new DriverFactory().getDriver(property("browser"));
         mainPage = new MainPage(driver);
         signInPage = new SignInPage(driver);
-        driver.get("http://automationpractice.com/index.php");
+        mainPageHelper = new MainPageHelper(driver);
+        signInPageHelper = new SignInPageHelper(driver);
 
     }
 
@@ -38,8 +48,12 @@ public class FirstSeleniumPractice {
     }
 
     @Test
-    public void isLogoDisplayed(){
+    @Description("Test Description: check Logo is displayed on Main Page")
+    @Severity(SeverityLevel.MINOR)
+    @Link("https://example.org")
+    public void checkLogoDisplayed(){
 
+        mainPageHelper.openMainPage();
         mainPage.getLogo().click();
         assertTrue(mainPage.getLogo().isDisplayed());
 
@@ -47,15 +61,21 @@ public class FirstSeleniumPractice {
     }
 
     @Test
-    public void isSearchFieldDisplayed(){
+    @Description("Test Description: check search input field is displayed on the Main Page")
+    @Severity(SeverityLevel.NORMAL)
+    public void checkSearchFieldDisplayed(){
 
+        mainPageHelper.openMainPage();
         assertTrue(mainPage.getSearchInputField().isDisplayed());
 
     }
 
     @Test
+    @Description("Test Description: check functionality of search input field on the Main Page")
+    @Severity(SeverityLevel.CRITICAL)
     public void checkSearchFieldFunctionality(){
 
+        mainPageHelper.openMainPage();
         assertTrue(mainPage.getSearchInputField().isDisplayed());
         mainPage.getSearchInputField().clear();
         mainPage.getSearchInputField().sendKeys("Blouse");
@@ -64,8 +84,12 @@ public class FirstSeleniumPractice {
         Assert.assertEquals("Blouse",mainPage.getItemBlouse().getText());
     }
 
-    @Test(priority = 1, dataProvider = "userEmail")
+    @Test(priority = 1, dataProvider = "userEmail", enabled = false)
+    @Description("Test Description: check create account page is displayed")
+    @Severity(SeverityLevel.CRITICAL)
     public void checkCreateAccountPage(String email){
+
+        mainPageHelper.openMainPage();
 
         assertTrue(mainPage.getSignInButton().isDisplayed());
         mainPage.getSignInButton().click();
@@ -83,8 +107,12 @@ public class FirstSeleniumPractice {
         return new Object[][]{{"test@gmail.com"},{"test@hotmail.com"},{"test@yahoo.com"}};
     }
 
-    @Test (priority = 1, dataProvider = "invalidEmails")
+    @Test (priority = 1, dataProvider = "invalidEmails", enabled = false)
+    @Description("Test Description: check input invalid Email to the input Email Field on the create account form")
+    @Severity(SeverityLevel.CRITICAL)
     public void checkInputInvalidEmail(String val){
+
+        mainPageHelper.openMainPage();
 
         assertTrue(mainPage.getSignInButton().isEnabled());
         mainPage.getSignInButton().click();
@@ -107,7 +135,11 @@ public class FirstSeleniumPractice {
     }
 
     @Test
+    @Description("Test Description: check days dropdown on the SignIn Page")
+    @Severity(SeverityLevel.NORMAL)
     public void checkDaysDropDown31Days(){
+
+        mainPageHelper.openMainPage();
 
         assertTrue(mainPage.getSignInButton().isEnabled());
         mainPage.getSignInButton().click();
@@ -121,9 +153,9 @@ public class FirstSeleniumPractice {
 
         signInPage.getCreateAccountButton().click();
 
-        //Применяем явное ожидание
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOf(signInPage.getDaysDropdown()));
+//        //Применяем явное ожидание
+//        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+//        wait.until(ExpectedConditions.visibilityOf(signInPage.getDaysDropdown()));
 
         assertTrue(signInPage.getDaysDropdown().isEnabled());
     }
